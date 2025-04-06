@@ -7,12 +7,12 @@ class QuantitySelector extends StatelessWidget {
   final bool compact;
   
   const QuantitySelector({
-    Key? key,
+    super.key,
     required this.quantity,
     required this.maxQuantity,
     required this.onChanged,
     this.compact = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

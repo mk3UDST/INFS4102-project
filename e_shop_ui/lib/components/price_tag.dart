@@ -7,12 +7,12 @@ class PriceTag extends StatelessWidget {
   final bool large;
   
   const PriceTag({
-    Key? key,
+    super.key,
     required this.price,
     this.originalPrice,
     this.showDiscount = false,
     this.large = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

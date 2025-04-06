@@ -19,4 +19,6 @@ class User {
       address: json['address'] ?? '',
     );
   }
+
+  toJson() {}
 }

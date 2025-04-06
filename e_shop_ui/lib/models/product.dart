@@ -1,5 +1,3 @@
-import 'package:e_shop_ui/models/category.dart';
-
 class Product {
   final int id;
   final String name;
@@ -19,33 +17,54 @@ class Product {
     required this.category,
   });
 
-  factory Product.fromJson(Map<String, dynamic> json) {
-    // Handle category based on what the API returns
-    Category productCategory;
-
-    if (json['category'] == null) {
-      productCategory = Category(id: 0, name: 'Unknown', description: '');
-    } else if (json['category'] is Map<String, dynamic>) {
-      productCategory = Category.fromJson(json['category']);
-    } else if (json['category'] is int) {
-      productCategory = Category(
-        id: json['category'],
-        name: 'Unknown',
+  factory Product.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return Product(
+        id: 0,
+        name: 'Unknown Product',
         description: '',
+        price: 0.0,
+        imageUrl: null,
+        stockQuantity: 0,
+        category: Category(id: 0, name: 'Unknown', description: ''),
       );
+    }
+
+    // Handle the category field which could be null or a Map
+    Category productCategory;
+    var categoryData = json['category'];
+
+    if (categoryData == null) {
+      productCategory = Category(id: 0, name: 'Unknown', description: '');
+    } else if (categoryData is Map<String, dynamic>) {
+      productCategory = Category.fromJson(categoryData);
     } else {
-      // Fallback with default category
+      // If it's neither null nor a Map, create a default category
       productCategory = Category(id: 0, name: 'Unknown', description: '');
     }
 
     return Product(
       id: json['id'] ?? 0,
-      name: json['name'] ?? '',
+      name: json['name'] ?? 'Unknown Product',
       description: json['description'] ?? '',
-      price: (json['price'] is num) ? json['price'].toDouble() : 0.0,
+      // Handle price which could be a string, number, or null
+      price: _parsePrice(json['price']),
       imageUrl: json['imageUrl'],
       stockQuantity: json['stockQuantity'] ?? 0,
       category: productCategory,
+    );
+  }
+
+  // Factory to create a placeholder/empty product
+  factory Product.placeholder() {
+    return Product(
+      id: -1,
+      name: "",
+      price: 0.0,
+      description: "",
+      imageUrl: null,
+      stockQuantity: 0,
+      category: Category(id: 0, name: 'Unknown', description: ''),
     );
   }
 
@@ -64,6 +83,39 @@ class Product {
   @override
   String toString() {
     return name;
+  }
+
+  static double _parsePrice(dynamic price) {
+    if (price == null) {
+      return 0.0;
+    } else if (price is String) {
+      return double.tryParse(price) ?? 0.0;
+    } else if (price is num) {
+      return price.toDouble();
+    } else {
+      return 0.0;
+    }
+  }
+
+  // Add copyWith method to allow creating a copy with modified properties
+  Product copyWith({
+    int? id,
+    String? name,
+    String? description,
+    double? price,
+    String? imageUrl,
+    int? stockQuantity,
+    Category? category,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      imageUrl: imageUrl, // Allow null to be passed explicitly
+      stockQuantity: stockQuantity ?? this.stockQuantity,
+      category: category ?? this.category,
+    );
   }
 }
 

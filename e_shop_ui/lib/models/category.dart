@@ -6,7 +6,11 @@ class Category {
 
   Category({required this.id, required this.name, required this.description});
 
-  factory Category.fromJson(Map<String, dynamic> json) {
+  factory Category.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return Category(id: 0, name: 'Unknown', description: '');
+    }
+
     return Category(
       id: json['id'] ?? 0,
       name: json['name'] ?? 'Unknown',
@@ -20,6 +24,6 @@ class Category {
 
   @override
   String toString() {
-    return name; // Properly convert to string when needed
+    return name;
   }
 }

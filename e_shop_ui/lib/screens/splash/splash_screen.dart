@@ -3,16 +3,17 @@ import 'dart:async';
 import 'package:e_shop_ui/screens/home/home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
-  
+
   @override
   void initState() {
     super.initState();
@@ -20,24 +21,23 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       vsync: this,
       duration: Duration(milliseconds: 1500),
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeIn,
-      ),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
-    
+
     _animationController.forward();
-    
+
     // Navigate to home screen after 3 seconds
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(
+          builder: (_) => HomeScreen(),
+        ), // Navigate to HomeScreen
       );
     });
   }
-  
+
   @override
   void dispose() {
     _animationController.dispose();

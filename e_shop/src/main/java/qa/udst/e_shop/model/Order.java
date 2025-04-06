@@ -44,6 +44,17 @@ public class Order {
     
     private BigDecimal totalAmount;
     
+    // Add delivery address fields
+    private String deliveryAddress;
+    private String city;
+    private String postalCode;
+    private String country;
+    
+    // Add tracking information
+    private String trackingNumber;
+    private LocalDateTime shippedDate;
+    private LocalDateTime deliveredDate;
+    
     @JsonManagedReference("order-items")
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
@@ -107,5 +118,62 @@ public class Order {
 
     public void setItems(List<OrderItem> items) {
         this.items = items;
+    }
+
+    // Add new getters and setters
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public LocalDateTime getShippedDate() {
+        return shippedDate;
+    }
+
+    public void setShippedDate(LocalDateTime shippedDate) {
+        this.shippedDate = shippedDate;
+    }
+
+    public LocalDateTime getDeliveredDate() {
+        return deliveredDate;
+    }
+
+    public void setDeliveredDate(LocalDateTime deliveredDate) {
+        this.deliveredDate = deliveredDate;
     }
 }

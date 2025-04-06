@@ -14,13 +14,10 @@ public class CorsConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         
-        // Allow all origins or specify your Flutter web app origin
-        config.addAllowedOrigin("*");  // For development; restrict this in production
+        config.addAllowedOrigin("*");  
         
-        // Allow all headers
         config.addAllowedHeader("*");
         
-        // Allow all methods (GET, POST, PUT, DELETE, etc.)
         config.addAllowedMethod("*");
         
         source.registerCorsConfiguration("/**", config);

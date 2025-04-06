@@ -6,13 +6,13 @@ import 'package:e_shop_ui/models/category.dart' as category_model;
 import 'package:e_shop_ui/models/product.dart';
 import 'package:e_shop_ui/components/product_card.dart';
 import 'package:e_shop_ui/components/category_card.dart';
-import 'package:e_shop_ui/screens/products/product_list_screen.dart';
-import 'package:e_shop_ui/screens/cart/cart_screen.dart';
+import 'package:e_shop_ui/screens/cart/cart_screen.dart'; // Ensure CartScreen is correctly referenced
 import 'package:e_shop_ui/screens/orders/order_history_screen.dart';
-import 'package:e_shop_ui/screens/profile/profile_screen.dart';
+import 'package:e_shop_ui/screens/profile/profile_screen.dart'; // Import ProfileScreen
+import 'package:e_shop_ui/screens/products/product_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -30,30 +30,37 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _loadData() {
     _categoriesFuture = CategoryApi.getAllCategories();
-    _featuredProductsFuture = ProductApi.getFeaturedProducts();
+    _featuredProductsFuture = ProductApi.getAllProducts();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('E-Shop', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'E-Shop',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         actions: [
           IconButton(
-            icon: Icon(Icons.shopping_cart),
+            icon: const Icon(Icons.shopping_cart),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => CartScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const CartScreen(),
+                ), // Ensure CartScreen is correctly referenced
               );
             },
           ),
           IconButton(
-            icon: Icon(Icons.person),
+            icon: const Icon(Icons.person),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const ProfileScreen(),
+                ), // Ensure ProfileScreen is correctly referenced
               );
             },
           ),
@@ -105,28 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.category),
-              title: Text('Categories'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => ProductListScreen(isNewCollection: false, isFeatured: false,)),
-                );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.shopping_cart),
-              title: Text('My Cart'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => CartScreen()),
-                );
-              },
-            ),
-            ListTile(
               leading: Icon(Icons.receipt_long),
               title: Text('My Orders'),
               onTap: () {
@@ -135,15 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => OrderHistoryScreen()),
                 );
-              },
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                // Navigate to settings
               },
             ),
             ListTile(
@@ -155,14 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => ProfileScreen()),
                 );
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              onTap: () {
-                // Implement logout
-                Navigator.pop(context);
               },
             ),
           ],
@@ -197,13 +165,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     onSubmitted: (value) {
                       if (value.isNotEmpty) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => ProductListScreen(isNewCollection: false, isFeatured: false,),
-                          ),
-                        );
+                        // Do nothing or navigate elsewhere
+                        Navigator.pop(context);
                       }
                     },
                   ),
@@ -217,15 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(15),
                     color: Theme.of(
                       context,
-                    ).primaryColor.withOpacity(0.2), // Fallback color
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/banner.jpg'),
-                      fit: BoxFit.cover,
-                      onError: (exception, stackTrace) {
-                        // Handle missing asset
-                        print('Error loading banner image: $exception');
-                      },
-                    ),
+                    ).primaryColor.withOpacity(0.2), // Use this as fallback
                   ),
                   child: Container(
                     decoration: BoxDecoration(
@@ -261,15 +216,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () {
-                              // Navigate to new collection products
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (_) => ProductListScreen(
-                                        isNewCollection: true, isFeatured: false,
-                                      ),
-                                ),
+                              // Removed navigation to ProductListScreen (New Collection)
+                              // Display a message instead
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Feature coming soon!')),
                               );
                             },
                             style: ElevatedButton.styleFrom(
@@ -297,26 +247,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => ProductListScreen(isNewCollection: false, isFeatured: false,),
-                            ),
-                          );
-                        },
-                        child: Text('View All'),
-                      ),
+                      // Removed the "View All" button
                     ],
                   ),
                 ),
 
                 SizedBox(height: 10),
 
-                // Categories List - FIXED: Added the missing categories list
+                // Categories List - Adjusted height
                 SizedBox(
-                  height: 120,
+                  height: 80, // Increased from 20px to prevent overflow
                   child: FutureBuilder<List<category_model.Category>>(
                     future: _categoriesFuture,
                     builder: (context, snapshot) {
@@ -332,21 +272,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: categories.length,
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                        ), // Reduced horizontal padding
                         itemBuilder: (context, index) {
                           final category = categories[index];
                           return Padding(
-                            padding: EdgeInsets.only(right: 12),
+                            padding: EdgeInsets.only(
+                              right: 8,
+                            ), // Reduced spacing between items
                             child: CategoryCard(
                               category: category,
                               onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (_) => ProductListScreen(
-                                          categoryId: category.id, isNewCollection: false, isFeatured: false,
-                                        ),
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Feature coming soon!'),
                                   ),
                                 );
                               },
@@ -360,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(height: 20),
 
-                // Featured Products - FIXED: Added the missing featured products section
+                // Featured Products Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
@@ -373,60 +313,78 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (_) => ProductListScreen(isNewCollection: false, isFeatured: false,),
-                            ),
-                          );
-                        },
-                        child: Text('View All'),
-                      ),
+                      // Removed the "View All" button
                     ],
                   ),
                 ),
 
                 SizedBox(height: 10),
 
-                // Featured Products Grid - FIXED: Added the missing products grid
+                // Featured Products Grid - Display all products in 3 columns
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: FutureBuilder<List<Product>>(
                     future: _featuredProductsFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
                       } else if (snapshot.hasError) {
-                        return Center(child: Text('Error loading products'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(
-                          child: Text('No featured products available'),
+                          child: Text(
+                            'Error loading products: ${snapshot.error}',
+                          ),
+                        );
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(20.0),
+                            child: Text('No products available'),
+                          ),
                         );
                       }
 
                       final products = snapshot.data!;
                       return GridView.builder(
                         shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.7,
-                          crossAxisSpacing: 10,
-                          mainAxisSpacing: 10,
-                        ),
-                        itemCount: products.length,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3, // 3 items per row
+                              childAspectRatio:
+                                  0.8, // Adjusted for better proportions
+                              crossAxisSpacing: 8,
+                              mainAxisSpacing:
+                                  12, // Increased spacing between rows
+                            ),
+                        itemCount: products.length, // Display all products
                         itemBuilder: (context, index) {
-                          return ProductCard(product: products[index]);
+                          return ProductCard(
+                            product: products[index],
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => ProductDetailScreen(
+                                        product: products[index],
+                                      ),
+                                ),
+                              );
+                            },
+                          );
                         },
                       );
                     },
                   ),
                 ),
 
-                SizedBox(height: 20),
+                // Add less bottom padding
+                SizedBox(height: 10), // Reduced from 20
               ],
             ),
           ),

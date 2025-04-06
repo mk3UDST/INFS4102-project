@@ -14,6 +14,7 @@ import qa.udst.e_shop.model.Cart;
 import qa.udst.e_shop.model.CartItem;
 import qa.udst.e_shop.model.Order;
 import qa.udst.e_shop.model.OrderItem;
+import qa.udst.e_shop.model.Product;
 import qa.udst.e_shop.model.User;
 import qa.udst.e_shop.model.Order.OrderStatus;
 import qa.udst.e_shop.repository.OrderRepository;
@@ -45,6 +46,15 @@ public class OrderService {
             throw new OrderException("Cannot create order from empty cart");
         }
         
+        // Validate all items in cart have sufficient stock
+        for (CartItem cartItem : cart.getItems()) {
+            Product product = cartItem.getProduct();
+            if (product.getStockQuantity() < cartItem.getQuantity()) {
+                throw new OrderException("Not enough stock for product: " + product.getName() + 
+                        ". Available: " + product.getStockQuantity() + ", Requested: " + cartItem.getQuantity());
+            }
+        }
+        
         BigDecimal totalAmount = cartService.calculateCartTotal(userId);
         
         Order order = new Order(user, totalAmount);
@@ -60,8 +70,13 @@ public class OrderService {
             );
             order.getItems().add(orderItem);
             
-            // Update product stock
-            productService.updateStock(cartItem.getProduct().getId(), cartItem.getQuantity());
+            try {
+                // Update product stock
+                productService.updateStock(cartItem.getProduct().getId(), cartItem.getQuantity());
+            } catch (Exception e) {
+                // If stock update fails, throw an exception and rollback the transaction
+                throw new OrderException("Failed to update stock for product: " + cartItem.getProduct().getName() + ". " + e.getMessage());
+            }
         }
         
         // Save updated order with items
@@ -89,8 +104,27 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with id: " + orderId));
         
+        // Add additional business logic for status transitions
+        if (order.getStatus() == OrderStatus.CANCELED && status != OrderStatus.CANCELED) {
+            throw new OrderException("Cannot change status of a canceled order");
+        }
+        
+        // If canceling an order, restore product stock
+        if (status == OrderStatus.CANCELED && order.getStatus() != OrderStatus.CANCELED) {
+            restoreProductStock(order);
+        }
+        
         order.setStatus(status);
         return orderRepository.save(order);
+    }
+
+    // Add new method to handle restoring stock when order is canceled
+    private void restoreProductStock(Order order) {
+        for (OrderItem item : order.getItems()) {
+            Product product = item.getProduct();
+            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            productService.createProduct(product);
+        }
     }
 
     public List<Order> getAllOrders() {

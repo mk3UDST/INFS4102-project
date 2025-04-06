@@ -8,12 +8,12 @@ class CartItemCard extends StatelessWidget {
   final bool isEditable;
 
   const CartItemCard({
-    Key? key,
+    super.key,
     required this.item,
     required this.onQuantityChanged,
     required this.onRemove,
     this.isEditable = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

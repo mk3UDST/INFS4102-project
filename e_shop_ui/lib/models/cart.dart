@@ -1,42 +1,44 @@
-// lib/models/cart.dart
-import 'package:e_shop_ui/models/product.dart';
-
-class CartItem {
-  final Product product;
-  final int quantity;
-  
-  CartItem({
-    required this.product,
-    required this.quantity,
-  });
-  
-  factory CartItem.fromJson(Map<String, dynamic> json) {
-    return CartItem(
-      product: Product.fromJson(json['product']),
-      quantity: json['quantity'],
-    );
-  }
-  
-  double get total => product.price * quantity;
-}
+import 'package:e_shop_ui/models/cart_item.dart';
 
 class Cart {
   final int id;
+  final int userId;
   final List<CartItem> items;
-  
+  final double totalAmount;
+
   Cart({
     required this.id,
+    required this.userId,
     required this.items,
+    required this.totalAmount,
   });
-  
+
   factory Cart.fromJson(Map<String, dynamic> json) {
+    List<CartItem> cartItems = [];
+    if (json['items'] != null) {
+      cartItems =
+          (json['items'] as List)
+              .map((item) => CartItem.fromJson(item))
+              .toList();
+    }
+
     return Cart(
-      id: json['id'],
-      items: (json['items'] as List)
-          .map((item) => CartItem.fromJson(item))
-          .toList(),
+      id: json['id'] ?? 0,
+      userId: json['userId'] ?? 1, // Default to userId 1 if not provided
+      items: cartItems,
+      totalAmount:
+          json['totalAmount'] is int
+              ? (json['totalAmount'] as int).toDouble()
+              : (json['totalAmount'] as num?)?.toDouble() ?? 0.0,
     );
   }
-  
-  double get total => items.fold(0, (sum, item) => sum + item.total);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'items': items.map((item) => item.toJson()).toList(),
+      'totalAmount': totalAmount,
+    };
+  }
 }

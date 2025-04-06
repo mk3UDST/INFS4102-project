@@ -4,7 +4,7 @@ import 'package:e_shop_ui/api/user_api.dart';
 import 'package:e_shop_ui/models/user.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
@@ -27,9 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('My Profile'),
-      ),
+      appBar: AppBar(title: Text('My Profile')),
       body: FutureBuilder<User>(
         future: _userFuture,
         builder: (context, snapshot) {
@@ -77,38 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
-                _buildInfoCard(
-                  title: 'Account Actions',
-                  child: Column(
-                    children: [
-                      _buildActionRow(
-                        Icons.edit, 
-                        'Edit Profile', 
-                        () {
-                          // Navigate to edit profile
-                        }
-                      ),
-                      Divider(),
-                      _buildActionRow(
-                        Icons.lock, 
-                        'Change Password', 
-                        () {
-                          // Navigate to change password
-                        }
-                      ),
-                      Divider(),
-                      _buildActionRow(
-                        Icons.logout, 
-                        'Logout', 
-                        () {
-                          // Implement logout
-                        },
-                        isDestructive: true,
-                      ),
-                    ],
-                  ),
-                ),
+                // Removed the "Account Actions" section
               ],
             ),
           );
@@ -128,10 +95,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 16),
             child,
@@ -153,15 +117,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
               ),
-              Text(
-                value,
-                style: TextStyle(fontSize: 16),
-              ),
+              Text(value, style: TextStyle(fontSize: 16)),
             ],
           ),
         ],
@@ -169,7 +127,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildActionRow(IconData icon, String title, VoidCallback onTap, {bool isDestructive = false}) {
+  Widget _buildActionRow(
+    IconData icon,
+    String title,
+    VoidCallback onTap, {
+    bool isDestructive = false,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -177,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           children: [
             Icon(
-              icon, 
+              icon,
               color: isDestructive ? Colors.red : Colors.grey[600],
               size: 20,
             ),

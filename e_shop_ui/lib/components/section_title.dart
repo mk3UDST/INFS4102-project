@@ -6,11 +6,11 @@ class SectionTitle extends StatelessWidget {
   final VoidCallback? onActionPressed;
   
   const SectionTitle({
-    Key? key, 
+    super.key, 
     required this.title,
     this.actionText,
     this.onActionPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +27,11 @@ class SectionTitle extends StatelessWidget {
         if (actionText != null && onActionPressed != null)
           TextButton(
             onPressed: onActionPressed,
-            child: Text(actionText!),
             style: TextButton.styleFrom(
               padding: EdgeInsets.symmetric(horizontal: 8),
               minimumSize: Size(0, 0),
             ),
+            child: Text(actionText!),
           ),
       ],
     );

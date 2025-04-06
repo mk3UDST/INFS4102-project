@@ -4,67 +4,58 @@ import 'package:e_shop_ui/models/category.dart';
 class CategoryCard extends StatelessWidget {
   final Category category;
   final VoidCallback onTap;
-  
-  const CategoryCard({
-    Key? key, 
-    required this.category, 
-    required this.onTap,
-  }) : super(key: key);
+
+  const CategoryCard({super.key, required this.category, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 100,
-        margin: EdgeInsets.only(right: 12),
+        width: 70, // Reduced width
+        margin: EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(8),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: Colors.grey.withOpacity(0.15),
               spreadRadius: 1,
-              blurRadius: 4,
-              offset: Offset(0, 2),
+              blurRadius: 2,
+              offset: Offset(0, 1),
             ),
           ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Category icon based on name
-            Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
+        child: Padding(
+          padding: EdgeInsets.all(4), // Reduced padding
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Use minimum size
+            children: [
+              // Category icon
+              Icon(
                 _getCategoryIcon(category.name),
                 color: Theme.of(context).primaryColor,
-                size: 28,
+                size: 24, // Smaller icon
               ),
-            ),
-            SizedBox(height: 8),
-            // Category name
-            Text(
-              category.name,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+              SizedBox(height: 4), // Reduced spacing
+              // Category name - with limited height
+              Flexible(
+                // Allow text to be sized appropriately
+                child: Text(
+                  category.name,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 10), // Smaller text
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
-  
+
   // Helper to get an appropriate icon for category
   IconData _getCategoryIcon(String categoryName) {
     switch (categoryName.toLowerCase()) {

@@ -6,9 +6,9 @@ class OrderDetailScreen extends StatelessWidget {
   final Order order;
   
   const OrderDetailScreen({
-    Key? key,
+    super.key,
     required this.order, required int orderId,
-  }) : super(key: key);
+  });
 
   Color _getStatusColor(OrderStatus status) {
     switch (status) {

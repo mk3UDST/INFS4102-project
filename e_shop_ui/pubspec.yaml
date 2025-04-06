@@ -60,6 +60,9 @@ flutter:
   
   assets:
     - assets/images/
+    - assets/images/banner.jpg
+    # Removed reference to non-existent assets
+    # - assets/images/placeholder.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:

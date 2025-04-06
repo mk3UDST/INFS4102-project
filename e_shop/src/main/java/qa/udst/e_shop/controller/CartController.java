@@ -3,11 +3,14 @@ package qa.udst.e_shop.controller;
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import qa.udst.e_shop.model.Cart;
 import qa.udst.e_shop.service.CartService;
+import qa.udst.e_shop.exception.CartException;
+import qa.udst.e_shop.exception.ResourceNotFoundException;
 
 @RestController
 @RequestMapping("/api/carts")
@@ -38,20 +41,34 @@ public class CartController {
     
     // Add item to cart
     @PostMapping("/user/{userId}/items")
-    public ResponseEntity<Cart> addItemToCart(
+    public ResponseEntity<?> addItemToCart(
             @PathVariable Long userId,
             @RequestParam Long productId,
             @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartService.addItemToCart(userId, productId, quantity));
+        try {
+            Cart cart = cartService.addItemToCart(userId, productId, quantity);
+            return ResponseEntity.ok(cart);
+        } catch (CartException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
     // Update cart item quantity
     @PutMapping("/user/{userId}/items")
-    public ResponseEntity<Cart> updateCartItemQuantity(
+    public ResponseEntity<?> updateCartItemQuantity(
             @PathVariable Long userId,
             @RequestParam Long productId,
             @RequestParam Integer quantity) {
-        return ResponseEntity.ok(cartService.updateCartItemQuantity(userId, productId, quantity));
+        try {
+            Cart cart = cartService.updateCartItemQuantity(userId, productId, quantity);
+            return ResponseEntity.ok(cart);
+        } catch (CartException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
     
     // Remove item from cart
@@ -67,5 +84,23 @@ public class CartController {
     public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
         cartService.clearCart(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Create a new cart for a user
+    @PostMapping("/user/{userId}/new")
+    public ResponseEntity<Cart> createNewCart(@PathVariable Long userId) {
+        try {
+            // First clear any existing cart
+            cartService.clearCart(userId);
+            
+            // Then get a new cart (which will be created if none exists)
+            Cart newCart = cartService.getCartByUserId(userId);
+            return ResponseEntity.ok(newCart);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(null);
+        }
     }
 }

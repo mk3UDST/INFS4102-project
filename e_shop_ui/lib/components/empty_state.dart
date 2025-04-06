@@ -8,13 +8,13 @@ class EmptyState extends StatelessWidget {
   final VoidCallback? onButtonPressed;
   
   const EmptyState({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     this.message,
     this.buttonText,
     this.onButtonPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +56,10 @@ class EmptyState extends StatelessWidget {
             SizedBox(height: 24),
             ElevatedButton(
               onPressed: onButtonPressed,
-              child: Text(buttonText!),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
+              child: Text(buttonText!),
             ),
           ],
         ],
