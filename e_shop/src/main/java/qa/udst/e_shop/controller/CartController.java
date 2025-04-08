@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import qa.udst.e_shop.model.Cart;
+import qa.udst.e_shop.model.CartItem;
 import qa.udst.e_shop.service.CartService;
 import qa.udst.e_shop.exception.CartException;
 import qa.udst.e_shop.exception.ResourceNotFoundException;
@@ -102,5 +103,12 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(null);
         }
+    }
+
+    // Get cart item
+    @GetMapping("/{cartId}/items/{productId}")
+    public ResponseEntity<CartItem> getCartItem(@PathVariable Long cartId, @PathVariable Long productId) {
+        CartItem cartItem = cartService.getCartItem(cartId, productId);
+        return ResponseEntity.ok(cartItem);
     }
 }

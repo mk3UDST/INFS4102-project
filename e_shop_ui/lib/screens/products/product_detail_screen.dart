@@ -1,4 +1,3 @@
-// lib/screens/products/product_detail_screen.dart
 import 'package:flutter/material.dart';
 import 'package:e_shop_ui/api/cart_api.dart';
 import 'package:e_shop_ui/models/product.dart';
@@ -21,7 +20,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
     try {
       // Use the correct API endpoint to add items to the cart
-      await CartApi.addItemToCart(1, widget.product.id, _quantity);
+      await CartApi.addToCart(1, widget.product.id, _quantity);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

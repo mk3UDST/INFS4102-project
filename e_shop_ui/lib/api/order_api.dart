@@ -29,15 +29,15 @@ class OrderApi {
     }
   }
 
-  static Future<Order> createOrderFromCart(int userId, String shippingAddress, String paymentMethod) async {
+  static Future<Order> createOrderFromCart(int userId) async {
     final response = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}/api/orders/create-from-cart/$userId'),
+      Uri.parse('${ApiConfig.baseUrl}/api/orders/user/$userId/checkout'),
     );
 
     if (response.statusCode == 201) {
       return Order.fromJson(jsonDecode(response.body));
     } else {
-      throw Exception('Failed to create order');
+      throw Exception('Failed to create order: ${response.body}');
     }
   }
 

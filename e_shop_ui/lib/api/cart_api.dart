@@ -1,125 +1,98 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:e_shop_ui/models/cart.dart';
+import 'package:e_shop_ui/models/cart_item.dart';
 import 'package:e_shop_ui/config/api_config.dart';
 
 class CartApi {
+  static final String baseUrl = ApiConfig.baseUrl;
+
+  // Get cart by user ID
   static Future<Cart> getCartByUserId(int userId) async {
-    try {
-      // Use the cart endpoint with query parameters for complete product details
-      final response = await http.get(
-        Uri.parse(
-          '${ApiConfig.baseUrl}/api/carts/user/$userId?includeProducts=true',
-        ),
-      );
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/carts/user/$userId'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode == 200) {
-        // Debug print to see the response structure
-        print('Cart response: ${response.body}');
-        return Cart.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception('Failed to load cart: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error fetching cart: $e');
-      throw Exception('Error fetching cart: $e');
+    if (response.statusCode == 200) {
+      return Cart.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load cart: ${response.statusCode}');
     }
   }
 
-  static Future<Cart> addItemToCart(
-    int userId,
-    int productId,
-    int quantity,
-  ) async {
-    try {
-      // Debugging: Log the request details
-      print(
-        'Adding item to cart: userId=$userId, productId=$productId, quantity=$quantity',
-      );
+  // Get cart item details
+  static Future<CartItem> addItemToCart(int cartId, int productId, int quantity) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/carts/$cartId/items/$productId'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      // Use query parameters instead of JSON body if required by the backend
-      final response = await http.post(
-        Uri.parse(
-          '${ApiConfig.baseUrl}/api/carts/user/$userId/items?productId=$productId&quantity=$quantity',
-        ),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      // Debugging: Log the response details
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return Cart.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception(
-          'Failed to add item to cart: ${response.statusCode} - ${response.body}',
-        );
-      }
-    } catch (e) {
-      print('Error adding item to cart: $e');
-      throw Exception('Error adding item to cart: $e');
+    if (response.statusCode == 200) {
+      return CartItem.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load cart item: ${response.statusCode}');
     }
   }
 
-  static Future<Cart> updateCartItemQuantity(
-    int userId,
-    int productId,
-    int quantity,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse(
-          '${ApiConfig.baseUrl}/api/carts/user/$userId/items/$productId',
-        ),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'quantity': quantity}),
-      );
+  // Add item to cart
+  static Future<Cart> addToCart(int userId, int productId, int quantity) async {
+    print('CartApi.addToCart: userId=$userId, productId=$productId, quantity=$quantity'); // Debug
+    
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/carts/user/$userId/items'),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: {
+        'productId': productId.toString(),
+        'quantity': quantity.toString(),
+      },
+    );
 
-      if (response.statusCode == 200) {
-        return Cart.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception('Failed to update cart item: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error updating cart item: $e');
-      throw Exception('Error updating cart item: $e');
+    print('CartApi response status: ${response.statusCode}'); // Debug
+    print('CartApi response body: ${response.body}'); // Debug
+    
+    if (response.statusCode == 200) {
+      final cart = Cart.fromJson(json.decode(response.body));
+      print('Cart parsed successfully with ${cart.items.length} items'); // Debug
+      return cart;
+    } else {
+      throw Exception('Failed to add item to cart: ${response.body}');
     }
   }
 
+  // Remove item from cart
   static Future<Cart> removeItemFromCart(int userId, int productId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse(
-          '${ApiConfig.baseUrl}/api/carts/user/$userId/items/$productId',
-        ),
-      );
+    final response = await http.delete(
+      Uri.parse('$baseUrl/api/carts/user/$userId/items/$productId'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode == 200) {
-        return Cart.fromJson(jsonDecode(response.body));
-      } else {
-        throw Exception(
-          'Failed to remove item from cart: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      print('Error removing item from cart: $e');
-      throw Exception('Error removing item from cart: $e');
+    if (response.statusCode == 200) {
+      return Cart.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to remove item from cart');
     }
   }
 
-  static Future<void> clearCart(int userId) async {
-    try {
-      final response = await http.delete(
-        Uri.parse('${ApiConfig.baseUrl}/api/carts/user/$userId/clear'),
-      );
+  // Get cart item details
+  static Future<CartItem> getCartItem(int cartId, int productId) async {
+    print('CartApi.getCartItem: cartId=$cartId, productId=$productId'); // Debug
+    
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/carts/$cartId/items/$productId'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to clear cart: ${response.statusCode}');
-      }
-    } catch (e) {
-      print('Error clearing cart: $e');
-      throw Exception('Error clearing cart: $e');
+    print('CartApi get item response status: ${response.statusCode}'); // Debug
+    print('CartApi get item response body: ${response.body}'); // Debug
+    
+    if (response.statusCode == 200) {
+      final cartItem = CartItem.fromJson(json.decode(response.body));
+      print('CartItem parsed successfully: id=${cartItem.id}, productId=${cartItem.productId}'); // Debug
+      return cartItem;
+    } else {
+      throw Exception('Failed to load cart item: ${response.statusCode}');
     }
   }
+
 }

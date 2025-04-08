@@ -44,7 +44,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
     }
     
-    // Create order from cart
+    // Create order from cart without requiring shipping/payment parameters
     @PostMapping("/user/{userId}/checkout")
     public ResponseEntity<Order> createOrderFromCart(@PathVariable Long userId) {
         return new ResponseEntity<>(orderService.createOrderFromCart(userId), HttpStatus.CREATED);

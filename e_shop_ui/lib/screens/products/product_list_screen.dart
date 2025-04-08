@@ -9,11 +9,11 @@ class ProductListScreen extends StatefulWidget {
   final bool isFeatured;
 
   const ProductListScreen({
-    Key? key,
+    super.key,
     required this.categoryId,
     this.isNewCollection = false,
     this.isFeatured = false,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();

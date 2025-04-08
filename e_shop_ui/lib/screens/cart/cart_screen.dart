@@ -4,9 +4,10 @@ import 'package:e_shop_ui/api/product_api.dart';
 import 'package:e_shop_ui/models/cart.dart';
 import 'package:e_shop_ui/models/cart_item.dart';
 import 'package:e_shop_ui/models/product.dart';
+import 'package:e_shop_ui/screens/order/order_screen.dart'; // Add this import
 
 class CartScreen extends StatefulWidget {
-  const CartScreen({Key? key}) : super(key: key);
+  const CartScreen({super.key});
 
   @override
   _CartScreenState createState() => _CartScreenState();
@@ -124,28 +125,26 @@ class _CartScreenState extends State<CartScreen> {
                   );
                 }
 
-                // Map cart items to products - improved matching logic
-                final List<CartItem> enhancedCartItems = [];
-                
-                for (var cartItem in cart.items) {
-                  // Find the full product details from the products list
+                // Map cart items to products using productId or product.id
+                final List<CartItem> enhancedCartItems = cart.items.map((cartItem) {
+                  // Use productId if available, otherwise fall back to product.id
+                  final int productIdToMatch = cartItem.productId ?? cartItem.product.id;
+                  
                   final matchingProduct = products.firstWhere(
-                    (p) => p.id == cartItem.product.id,
-                    orElse: () => cartItem.product,
-                  );
-                  
-                  // Debug logs to check matching
-                  print('Cart item product ID: ${cartItem.product.id}');
-                  print('Matching product found: ${matchingProduct.name}');
-                  
-                  enhancedCartItems.add(
-                    CartItem(
-                      id: cartItem.id,
-                      product: matchingProduct,
-                      quantity: cartItem.quantity,
+                    (product) => product.id == productIdToMatch,
+                    orElse: () => Product(
+                      id: productIdToMatch,
+                      name: cartItem.product.name.isNotEmpty ? cartItem.product.name : 'Unknown',
+                      price: cartItem.product.price > 0 ? cartItem.product.price : 0.0, description: '', stockQuantity: 1, category: cartItem.product.category,
                     ),
                   );
-                }
+
+                  return CartItem(
+                    id: cartItem.id,
+                    product: matchingProduct,
+                    quantity: cartItem.quantity,
+                  );
+                }).toList();
 
                 // Calculate total
                 double totalAmount = enhancedCartItems.fold(0, (sum, item) {
@@ -160,7 +159,7 @@ class _CartScreenState extends State<CartScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 8),
                         itemBuilder: (context, index) {
                           final item = enhancedCartItems[index];
-                          
+
                           return Card(
                             margin: const EdgeInsets.symmetric(
                               horizontal: 16,
@@ -189,8 +188,6 @@ class _CartScreenState extends State<CartScreen> {
                                             item.product.imageUrl!,
                                             fit: BoxFit.cover,
                                             errorBuilder: (context, error, stackTrace) {
-                                              // Log the error for debugging
-                                              print('Image error: $error for product ${item.product.id}');
                                               return const Icon(
                                                 Icons.image_not_supported,
                                                 size: 30,
@@ -204,14 +201,13 @@ class _CartScreenState extends State<CartScreen> {
                                             color: Colors.grey,
                                           ),
                                   ),
-                                  
+
                                   const SizedBox(width: 16),
 
                                   // Product Details
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           item.product.name,
@@ -234,17 +230,13 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                         const SizedBox(height: 8),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               '\$${item.product.price.toStringAsFixed(2)} × ${item.quantity}',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                color:
-                                                    Theme.of(
-                                                      context,
-                                                    ).primaryColor,
+                                                color: Theme.of(context).primaryColor,
                                               ),
                                             ),
                                             Text(
@@ -316,19 +308,25 @@ class _CartScreenState extends State<CartScreen> {
                             height: 50,
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).primaryColor,
+                                backgroundColor: Theme.of(context).primaryColor,
                                 foregroundColor: Colors.white,
                               ),
                               onPressed: () {
-                                // Navigate to checkout
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Proceeding to checkout...',
+                                // Simplified navigation approach
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OrderScreen(
+                                      cartItems: enhancedCartItems,
+                                      totalAmount: totalAmount,
+                                      cartId: cart.id,
                                     ),
                                   ),
-                                );
+                                ).then((_) {
+                                  setState(() {
+                                    _loadData();
+                                  });
+                                });
                               },
                               child: const Text(
                                 'Proceed to Checkout',
