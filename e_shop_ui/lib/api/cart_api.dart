@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:e_shop_ui/models/cart.dart';
+import 'package:e_shop_ui/models/cart_item.dart';
 import 'package:e_shop_ui/config/api_config.dart';
 
 class CartApi {
@@ -87,7 +88,7 @@ class CartApi {
     }
   }
 
-  static Future<Cart> removeItemFromCart(int userId, int productId) async {
+  static Future<void> removeItemFromCart(int userId, int productId) async {
     try {
       final response = await http.delete(
         Uri.parse(
@@ -95,9 +96,7 @@ class CartApi {
         ),
       );
 
-      if (response.statusCode == 200) {
-        return Cart.fromJson(jsonDecode(response.body));
-      } else {
+      if (response.statusCode != 200) {
         throw Exception(
           'Failed to remove item from cart: ${response.statusCode}',
         );

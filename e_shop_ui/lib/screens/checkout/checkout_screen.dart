@@ -4,6 +4,7 @@ import 'package:e_shop_ui/api/order_api.dart';
 import 'package:e_shop_ui/api/cart_api.dart';
 import 'package:e_shop_ui/models/cart.dart';
 import 'package:e_shop_ui/screens/orders/order_detail_screen.dart';
+import 'package:e_shop_ui/models/product.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final Cart?
@@ -112,13 +113,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Checkout')),
+      appBar: AppBar(title: const Text('Checkout')),
       body:
           _isProcessing
               ? Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: const [
                     CircularProgressIndicator(),
                     SizedBox(height: 16),
                     Text('Processing your order...'),
@@ -126,7 +127,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               )
               : SingleChildScrollView(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -234,7 +235,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
                           } else if (snapshot.hasError) {
                             return Center(
                               child: Column(
@@ -246,7 +249,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         _cartFuture = _loadCartData();
                                       });
                                     },
-                                    child: Text('Retry'),
+                                    child: const Text('Retry'),
                                   ),
                                 ],
                               ),
@@ -256,11 +259,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             return Center(
                               child: Column(
                                 children: [
-                                  Text('Your cart is empty'),
-                                  SizedBox(height: 16),
+                                  const Text('Your cart is empty'),
+                                  const SizedBox(height: 16),
                                   ElevatedButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: Text('Back to Shopping'),
+                                    child: const Text('Back to Shopping'),
                                   ),
                                 ],
                               ),
@@ -276,14 +279,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Order Summary',
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 16),
+                              const SizedBox(height: 16),
                               Card(
                                 elevation: 2,
                                 shape: RoundedRectangleBorder(
@@ -293,42 +296,76 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   padding: const EdgeInsets.all(16.0),
                                   child: Column(
                                     children: [
-                                      ...cart.items.map(
-                                        (item) => Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 8.0,
-                                          ),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  '${item.quantity}× ${item.product.name}',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
+                                      ...cart.items.map((item) {
+                                        // Fetch product details using productId
+                                        final product =
+                                            ProductApi.getProductById(
+                                              item.productId,
+                                            );
+
+                                        return FutureBuilder<Product>(
+                                          future: product,
+                                          builder: (context, productSnapshot) {
+                                            if (productSnapshot
+                                                    .connectionState ==
+                                                ConnectionState.waiting) {
+                                              return const Center(
+                                                child:
+                                                    CircularProgressIndicator(),
+                                              );
+                                            } else if (productSnapshot
+                                                .hasError) {
+                                              return Text(
+                                                'Error loading product: ${productSnapshot.error}',
+                                              );
+                                            } else if (!productSnapshot
+                                                .hasData) {
+                                              return const Text(
+                                                'Product not found',
+                                              );
+                                            }
+
+                                            final productDetails =
+                                                productSnapshot.data!;
+
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                bottom: 8.0,
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      '${item.quantity}× ${productDetails.name}',
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                    ),
                                                   ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  maxLines: 1,
-                                                ),
+                                                  Text(
+                                                    '\$${(productDetails.price * item.quantity).toStringAsFixed(2)}',
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                '\$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Divider(),
+                                            );
+                                          },
+                                        );
+                                      }).toList(),
+                                      const Divider(),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
+                                          const Text(
                                             'Total Items',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -348,12 +385,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           ),
                                         ],
                                       ),
-                                      Divider(),
+                                      const Divider(),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
+                                          const Text(
                                             'Total',
                                             style: TextStyle(
                                               fontSize: 18,
@@ -392,7 +429,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           onPressed: _placeOrder,
-                          child: Text(
+                          child: const Text(
                             'Place Order',
                             style: TextStyle(fontSize: 18),
                           ),
@@ -407,9 +444,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // Helper method to calculate cart total
   double _calculateCartTotal(Cart cart) {
-    return cart.items.fold(
-      0,
-      (total, item) => total + (item.product.price * item.quantity),
-    );
+    return cart.items.fold(0, (total, item) {
+      final product = ProductApi.getProductById(item.productId);
+      return total +
+          (product.price * item.quantity); // Ensure product details are fetched
+    });
   }
 }

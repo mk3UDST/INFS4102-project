@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import qa.udst.e_shop.model.Cart;
+import qa.udst.e_shop.model.CartItem;
 import qa.udst.e_shop.service.CartService;
 import qa.udst.e_shop.exception.CartException;
 import qa.udst.e_shop.exception.ResourceNotFoundException;
@@ -18,27 +19,27 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
-    
+
     // Get cart for a user
     @GetMapping("/user/{userId}")
     public ResponseEntity<Cart> getCartByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
-    
+
     // Get cart by ID
     @GetMapping("/{id}")
     public ResponseEntity<Cart> getCartById(@PathVariable Long id) {
         return cartService.getCartById(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    
+
     // Calculate cart total
     @GetMapping("/user/{userId}/total")
     public ResponseEntity<BigDecimal> calculateCartTotal(@PathVariable Long userId) {
         return ResponseEntity.ok(cartService.calculateCartTotal(userId));
     }
-    
+
     // Add item to cart
     @PostMapping("/user/{userId}/items")
     public ResponseEntity<?> addItemToCart(
@@ -54,7 +55,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     // Update cart item quantity
     @PutMapping("/user/{userId}/items")
     public ResponseEntity<?> updateCartItemQuantity(
@@ -70,7 +71,7 @@ public class CartController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     // Remove item from cart
     @DeleteMapping("/user/{userId}/items/{productId}")
     public ResponseEntity<Cart> removeItemFromCart(
@@ -78,7 +79,7 @@ public class CartController {
             @PathVariable Long productId) {
         return ResponseEntity.ok(cartService.removeItemFromCart(userId, productId));
     }
-    
+
     // Clear cart
     @DeleteMapping("/user/{userId}")
     public ResponseEntity<Void> clearCart(@PathVariable Long userId) {
@@ -92,7 +93,7 @@ public class CartController {
         try {
             // First clear any existing cart
             cartService.clearCart(userId);
-            
+
             // Then get a new cart (which will be created if none exists)
             Cart newCart = cartService.getCartByUserId(userId);
             return ResponseEntity.ok(newCart);
@@ -100,7 +101,13 @@ public class CartController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(null);
+                    .body(null);
         }
+    }
+
+    @GetMapping("/{cartId}/item/{productId}")
+    public ResponseEntity<CartItem> getCartItem(@PathVariable Long cartId, @PathVariable Long productId) {
+        CartItem cartItem = cartService.getCartItem(cartId, productId);
+        return ResponseEntity.ok(cartItem);
     }
 }

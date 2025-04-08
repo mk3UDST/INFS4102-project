@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:e_shop_ui/models/cart_item.dart';
+import 'package:e_shop_ui/models/product.dart';
 
 class CartItemCard extends StatelessWidget {
   final CartItem item;
+  final Product product; // Pass the product details separately
   final Function(int) onQuantityChanged;
   final Function() onRemove;
   final bool isEditable;
@@ -10,6 +12,7 @@ class CartItemCard extends StatelessWidget {
   const CartItemCard({
     super.key,
     required this.item,
+    required this.product,
     required this.onQuantityChanged,
     required this.onRemove,
     this.isEditable = true,
@@ -23,26 +26,29 @@ class CartItemCard extends StatelessWidget {
           isEditable ? DismissDirection.endToStart : DismissDirection.none,
       background: Container(
         alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         color: Colors.red,
-        child: Icon(Icons.delete, color: Colors.white),
+        child: const Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (_) async {
         return await showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Remove Item'),
-              content: Text(
+              title: const Text('Remove Item'),
+              content: const Text(
                 'Are you sure you want to remove this item from the cart?',
               ),
               actions: [
                 TextButton(
-                  child: Text('Cancel'),
+                  child: const Text('Cancel'),
                   onPressed: () => Navigator.of(context).pop(false),
                 ),
                 TextButton(
-                  child: Text('Remove', style: TextStyle(color: Colors.red)),
+                  child: const Text(
+                    'Remove',
+                    style: TextStyle(color: Colors.red),
+                  ),
                   onPressed: () => Navigator.of(context).pop(true),
                 ),
               ],
@@ -52,7 +58,7 @@ class CartItemCard extends StatelessWidget {
       },
       onDismissed: (_) => onRemove(),
       child: Card(
-        margin: EdgeInsets.symmetric(vertical: 8),
+        margin: const EdgeInsets.symmetric(vertical: 8),
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
@@ -60,7 +66,7 @@ class CartItemCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Product image - FIXED: proper null check with ?. operator
+              // Product image
               Container(
                 width: 80,
                 height: 80,
@@ -69,14 +75,14 @@ class CartItemCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child:
-                    item.product.imageUrl?.isNotEmpty == true
+                    product.imageUrl?.isNotEmpty == true
                         ? ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            item.product.imageUrl!,
+                            product.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
-                              return Icon(
+                              return const Icon(
                                 Icons.broken_image_outlined,
                                 size: 40,
                                 color: Colors.grey,
@@ -84,13 +90,13 @@ class CartItemCard extends StatelessWidget {
                             },
                           ),
                         )
-                        : Icon(
+                        : const Icon(
                           Icons.image_outlined,
                           size: 40,
                           color: Colors.grey,
                         ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
 
               // Item details
               Expanded(
@@ -99,28 +105,28 @@ class CartItemCard extends StatelessWidget {
                   children: [
                     // Product name
                     Text(
-                      item.product.name,
+                      product.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
 
                     // Price
                     Text(
-                      '\$${item.product.price.toStringAsFixed(2)}',
+                      '\$${product.price.toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).primaryColor,
                       ),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
 
-                    // Quantity selector - FIXED: larger touch targets
+                    // Quantity selector
                     if (isEditable)
                       Row(
                         children: [
@@ -131,25 +137,25 @@ class CartItemCard extends StatelessWidget {
                                     ? () => onQuantityChanged(item.quantity - 1)
                                     : null,
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           Text(
                             '${item.quantity}',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 8),
+                          const SizedBox(width: 8),
                           _buildQuantityButton(
                             icon: Icons.add,
                             onPressed:
                                 () => onQuantityChanged(item.quantity + 1),
                           ),
-                          Spacer(),
+                          const Spacer(),
                           // Subtotal
                           Text(
-                            'Total: \$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                            style: TextStyle(
+                            'Total: \$${(product.price * item.quantity).toStringAsFixed(2)}',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -168,8 +174,8 @@ class CartItemCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Subtotal: \$${(item.product.price * item.quantity).toStringAsFixed(2)}',
-                            style: TextStyle(
+                            'Subtotal: \$${(product.price * item.quantity).toStringAsFixed(2)}',
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
@@ -186,7 +192,6 @@ class CartItemCard extends StatelessWidget {
     );
   }
 
-  // FIXED: Better quantity button implementation with proper size
   Widget _buildQuantityButton({
     required IconData icon,
     VoidCallback? onPressed,
@@ -195,8 +200,8 @@ class CartItemCard extends StatelessWidget {
       onTap: onPressed,
       borderRadius: BorderRadius.circular(4),
       child: Container(
-        width: 32, // Increased size for better tap target
-        height: 32, // Increased size for better tap target
+        width: 32,
+        height: 32,
         decoration: BoxDecoration(
           color: onPressed == null ? Colors.grey[300] : Colors.grey[200],
           borderRadius: BorderRadius.circular(4),
@@ -204,7 +209,7 @@ class CartItemCard extends StatelessWidget {
         child: Center(
           child: Icon(
             icon,
-            size: 18, // Slightly larger icon
+            size: 18,
             color: onPressed == null ? Colors.grey[500] : Colors.black,
           ),
         ),
